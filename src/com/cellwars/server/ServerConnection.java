@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.FormatFlagsConversionMismatchException;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by Tam�s on 2015-04-27.
@@ -55,10 +57,10 @@ public class ServerConnection {
 
     public void sendMessage(int index, String ... message) throws IOException {
         try {
-            StringJoiner sj = new StringJoiner(":");
-            for (String s : message)
-                sj.add(s);
-            out.get(index).writeUTF(sj.toString());
+            String joinedMessage = Stream.of(message)
+                    .collect(Collectors.joining(":"));
+
+            out.get(index).writeUTF(joinedMessage);
         } catch (SocketException | NullPointerException e) {
             return;
         }
