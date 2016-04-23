@@ -1,5 +1,6 @@
 package com.cellwars.server;
 
+import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
@@ -7,7 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Created by Tamás on 2015-04-30.
+ * Created by Tamï¿½s on 2015-04-30.
  */
 public class CommandLine {
 
@@ -26,7 +27,7 @@ public class CommandLine {
     }
 
     public void print(String message) {
-        textArea.appendText(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm ")) + message + "\n");
+        Platform.runLater(() -> textArea.appendText(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm ")) + message + "\n"));
     }
 
     public void execute(Server server) {

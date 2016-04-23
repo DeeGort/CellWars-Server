@@ -6,7 +6,6 @@ import com.cellwars.scene.*;
 import com.cellwars.xml.CreateRules;
 import com.cellwars.xml.RulesLoader;
 import com.sun.javafx.geom.Vec2d;
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -69,19 +68,19 @@ public class Server {
 
         private boolean createServer() {
             try {
-                Platform.runLater(() -> commandLine.print("Starting server..."));
+                commandLine.print("Starting server...");
                 serverConnection.startServer(3000);
                 return true;
 
             } catch (IOException e) {
-                Platform.runLater(() -> commandLine.print(e.getMessage()));
+                commandLine.print(e.getMessage());
 
                 return false;
             }
         }
 
         private void initRules() {
-            Platform.runLater(() -> commandLine.print("Initialize rules..."));
+            commandLine.print("Initialize rules...");
 
             if (new File("rules.xml").isFile()) {
                 RulesLoader loadRules = new RulesLoader("rules.xml");
@@ -95,32 +94,32 @@ public class Server {
         }
 
         private void createScene() {
-            Platform.runLater(() -> commandLine.print("Creating scene..."));
+            commandLine.print("Creating scene...");
 
             scene = new Scene();
         }
 
         private void createMap() {
-            Platform.runLater(() -> commandLine.print("Creating map..."));
+            commandLine.print("Creating map...");
             Rules.MAP = new Rectangle(0, 0, 1024, 768);
         }
 
         private void preparePlayers() {
 
-            Platform.runLater(() -> commandLine.print("Preparing players..."));
+            commandLine.print("Preparing players...");
             players = new ArrayList<>();
             scene.preparePlayes(players);
 
         }
 
         private void spawningCookies() {
-            Platform.runLater(() -> commandLine.print("Spawning cookies..."));
+            commandLine.print("Spawning cookies...");
 
             scene.initCookies();
         }
 
         private void spawningMines() {
-            Platform.runLater(() -> commandLine.print("Spawning mines..."));
+            commandLine.print("Spawning mines...");
 
             scene.initMines();
         }
@@ -128,14 +127,14 @@ public class Server {
 
         private void waitForClient(int player) {
             try {
-                Platform.runLater(() -> commandLine.print("Waiting for clients..."));
+                commandLine.print("Waiting for clients...");
                 serverConnection.waitForClient();
-                Platform.runLater(() -> commandLine.print("Connection established..."));
+                commandLine.print("Connection established...");
                 serverConnection.connectionEstablished(player);
                 waitLoading = true;
 
             } catch (IOException e) {
-                Platform.runLater(() -> commandLine.print(e.getMessage()));
+                commandLine.print(e.getMessage());
             }
         }
 
@@ -148,14 +147,14 @@ public class Server {
                 players.add(new Player(playerinfo[1], Color.web(playerinfo[2])));
 
             } catch (IOException e) {
-                Platform.runLater(() -> commandLine.print(e.getMessage()));
+                commandLine.print(e.getMessage());
             }
         }
 
 
         private void sendRules(int player) {
             try {
-                Platform.runLater(() -> commandLine.print("Sending rules to clients..."));
+                commandLine.print("Sending rules to clients...");
 
                 //  =>
                 serverConnection.sendMessage(player,
@@ -166,13 +165,13 @@ public class Server {
                 );
 
             } catch (IOException e) {
-                Platform.runLater(() -> commandLine.print(e.getMessage()));
+                commandLine.print(e.getMessage());
             }
         }
 
         private void loadPlayers(int player) {
             try {
-                Platform.runLater(() -> commandLine.print("Loading players..."));
+                commandLine.print("Loading players...");
 
 
                 scene.spawnPlayers(player);
@@ -187,13 +186,13 @@ public class Server {
                         Double.toString(players.get(player).getCell().getPosition().y)
                 );
             } catch (IOException e) {
-                Platform.runLater(() -> commandLine.print(e.getMessage()));
+                commandLine.print(e.getMessage());
             }
         }
 
 
         private void gameLoop(int player) {
-            Platform.runLater(() -> commandLine.print("Play!"));
+            commandLine.print("Play!");
 
             Task gameloop = new Task<Void>() {
 
@@ -217,7 +216,7 @@ public class Server {
                             scene.attackPlayer();
 
                         } catch (IOException e) {
-                            Platform.runLater(() -> commandLine.print(e.getMessage()));
+                            commandLine.print(e.getMessage());
                         }
                     }
                 }
@@ -271,11 +270,11 @@ public class Server {
                         }
                 }
 
-                Platform.runLater(() -> commandLine.print(clientMessage));
+                commandLine.print(clientMessage);
 
                 return "OK";
             } catch (Scene.InvalidLocation | Scene.InvalidPlayer e) {
-                Platform.runLater(() -> commandLine.print(e.getMessage()));
+                commandLine.print(e.getMessage());
                 return "ERROR:" + e.getMessage();
             }
         }
