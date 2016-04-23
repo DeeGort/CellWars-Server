@@ -82,13 +82,12 @@ public class Scene {
 
     public void move(String playerName, Vec2d pos) throws InvalidPlayer, InvalidLocation {
 
-        Player player = null;
-        for(Player p : players) {
-            if (p.getName().equals(playerName)) {
-                player = p;
-                break;
-            }
-        }
+        Player player =
+                players.stream()
+                .filter( p-> p.getName().equals(playerName))
+                .findFirst()
+                .get();
+
         if (player == null)
             throw new InvalidPlayer("Invalid player");
 
