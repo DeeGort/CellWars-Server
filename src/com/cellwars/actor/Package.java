@@ -5,7 +5,7 @@ import com.sun.javafx.geom.Vec2d;
 import javafx.scene.shape.Circle;
 
 /**
- * Created by Tamás on 2015-05-24.
+ * Created by Tamï¿½s on 2015-05-24.
  */
 public class Package extends AElement {
     protected int id;
@@ -13,7 +13,7 @@ public class Package extends AElement {
     public Package(int id, Vec2d position) {
         super(position);
         this.id = id;
-        body.setRadius(Rules.PACKAGERADIUS);
+        body.setRadius(Rules.getRules().getPackageRadius());
     }
 
     public int getId() {

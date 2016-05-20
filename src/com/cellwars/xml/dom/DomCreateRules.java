@@ -1,8 +1,6 @@
-package com.cellwars.xml;
+package com.cellwars.xml.dom;
 
-import com.cellwars.actor.*;
-import com.cellwars.scene.Player;
-import com.cellwars.scene.Rules;
+import com.cellwars.xml.RulesCreator;
 import javafx.scene.shape.Rectangle;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -15,9 +13,9 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 
 /**
- * Created by Tamás on 2015-04-27.
+ * Created by Tamï¿½s on 2015-04-27.
  */
-public class CreateRules {
+public class DomCreateRules implements RulesCreator {
     private String output;
 
     private final Rectangle MAP = new Rectangle(0, 0, 1024, 768);
@@ -27,10 +25,11 @@ public class CreateRules {
     private final int MAXMINE = 10;
     private final float INCSIZE = 2.5f;
 
-    public CreateRules(String output) {
+    public DomCreateRules(String output) {
         this.output = output;
     }
 
+    @Override
     public void save() {
         Document doc = DocumentFactory.newDocument();
 
@@ -89,7 +88,6 @@ public class CreateRules {
 
     private void writeXML(Document d) {
 
-        System.out.println("itt");
         try {
             Transformer transformer = TransformerFactory.newInstance()
                     .newTransformer();

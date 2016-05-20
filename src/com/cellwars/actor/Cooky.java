@@ -3,7 +3,7 @@ package com.cellwars.actor;
 import com.sun.javafx.geom.Vec2d;
 
 /**
- * Created by Tamás on 2015-05-23.
+ * Created by Tamï¿½s on 2015-05-23.
  */
 public class Cooky extends Package {
 

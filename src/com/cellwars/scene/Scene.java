@@ -4,7 +4,12 @@ import com.cellwars.actor.Cell;
 import com.cellwars.actor.Cooky;
 import com.cellwars.actor.Mine;
 import com.sun.javafx.geom.Vec2d;
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.geometry.Point2D;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +24,11 @@ public class Scene {
     private List<Cooky> cookies;
     private List<Mine> mines;
 
+    public class NoPlayersInitialized extends Exception {
+        public NoPlayersInitialized(String message) {
+            super(message);
+        }
+    }
 
     public class InvalidPlayer extends Exception {
         public InvalidPlayer(String message) {
@@ -38,14 +48,14 @@ public class Scene {
 
     public void initCookies() {
         cookies = new ArrayList<>();
-        for (int i = 0; i != Rules.MAXCOOKY; i++) {
+        for (int i = 0; i != Rules.getRules().getMaxCooky(); i++) {
             cookies.add(spawnCookies(i));
         }
     }
 
     public void initMines() {
         mines = new ArrayList<>();
-        for (int i = 0; i != Rules.MAXMINE; i++) {
+        for (int i = 0; i != Rules.getRules().getMaxMine(); i++) {
             mines.add(spawnMines(i));
         }
     }
@@ -53,10 +63,10 @@ public class Scene {
     private Vec2d spawn() {
         Random random = new Random();
 
-        int maxPosX = (int) (Rules.MAP.getX() + Rules.MAP.getWidth());
-        int minPosX = (int) (Rules.MAP.getX());
-        int maxPosY = (int) (Rules.MAP.getY() + Rules.MAP.getHeight());
-        int minPosY = (int) (Rules.MAP.getY());
+        int maxPosX = (int) (Rules.getRules().getMap().getX() + Rules.getRules().getMap().getWidth());
+        int minPosX = (int) (Rules.getRules().getMap().getX());
+        int maxPosY = (int) (Rules.getRules().getMap().getY() + Rules.getRules().getMap().getHeight());
+        int minPosY = (int) (Rules.getRules().getMap().getY());
 
         float x = random.nextInt(maxPosX - minPosX) + minPosX;
         float y = random.nextInt(maxPosY - minPosY) + minPosY;
@@ -80,22 +90,26 @@ public class Scene {
         players.get(index).initCell(spawnCell());
     }
 
-    public void move(String playerName, Vec2d pos) throws InvalidPlayer, InvalidLocation {
+    public void move(String playerName, Vec2d pos) throws NoPlayersInitialized, InvalidPlayer, InvalidLocation {
 
-        Player player =
-                players.stream()
-                .filter( p-> p.getName().equals(playerName))
-                .findFirst()
-                .get();
+        if (players == null)
+            throw new NoPlayersInitialized("No players initialized");
 
+        Player player = null;
+        for(Player p : players) {
+            if (p.getName().equals(playerName)) {
+                player = p;
+                break;
+            }
+        }
         if (player == null)
             throw new InvalidPlayer("Invalid player");
 
         Point2D p2d = new Point2D(pos.x, pos.y);
-        if (!Rules.MAP.contains(p2d))
+        if (!Rules.getRules().getMap().convertToRectange().contains(p2d))
             throw new InvalidLocation("Invalid location");
 
-        player.getCell().moveTo(pos);
+        moveTo(player.getCell(), pos);
     }
 
 
@@ -104,7 +118,7 @@ public class Scene {
             for (int j = 0; j != cookies.size(); j++)
                 if (players.get(i).getCell().collide(cookies.get(j))) {
                     cookies.get(j).setPosition(spawn());
-                    players.get(i).getCell().increaseRadius(Rules.INCSIZE);
+                    players.get(i).getCell().increaseRadius(Rules.getRules().getIncSize());
                 }
     }
 
@@ -113,7 +127,7 @@ public class Scene {
             for (int j = 0; j != mines.size(); j++)
                 if (players.get(i).getCell().collide(mines.get(j))) {
                     mines.get(j).setPosition(spawn());
-                    players.get(i).getCell().decreaseRadius(Rules.INCSIZE);
+                    players.get(i).getCell().decreaseRadius(Rules.getRules().getIncSize());
                 }
     }
 
@@ -124,16 +138,27 @@ public class Scene {
                     if (players.get(i).getCell().collide(players.get(j).getCell())) {
                         if (players.get(i).getCell().getRadius() > players.get(j).getCell().getRadius()) {
                             players.get(j).initCell(new Cell(spawn()));
-                            players.get(i).getCell().increaseRadius(Rules.INCSIZE);
+                            players.get(i).getCell().increaseRadius(Rules.getRules().getIncSize());
                             players.get(j).getCell().setDead(true);
                         }
                         else if (players.get(i).getCell().getRadius() < players.get(j).getCell().getRadius()) {
                             players.get(i).initCell(new Cell(spawn()));
-                            players.get(j).getCell().increaseRadius(Rules.INCSIZE);
+                            players.get(j).getCell().increaseRadius(Rules.getRules().getIncSize());
                             players.get(i).getCell().setDead(true);
                         }
                     }
                 }
+    }
+
+    public void moveTo(Cell cell, Vec2d newPosition) {
+
+        Timeline t = new Timeline();
+        t.getKeyFrames().addAll(
+                new KeyFrame(Duration.millis(1000),
+                        new KeyValue(cell.getBody().centerXProperty(), newPosition.x, Interpolator.EASE_OUT),
+                        new KeyValue(cell.getBody().centerYProperty(), newPosition.y, Interpolator.EASE_OUT)
+                ));
+        t.play();
     }
 
     public List<Player> getPlayers() {

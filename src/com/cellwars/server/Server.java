@@ -2,13 +2,14 @@ package com.cellwars.server;
 
 import com.cellwars.actor.Cooky;
 import com.cellwars.actor.Mine;
-import com.cellwars.scene.*;
-import com.cellwars.xml.CreateRules;
-import com.cellwars.xml.RulesLoader;
+import com.cellwars.scene.Player;
+import com.cellwars.scene.Rules;
+import com.cellwars.scene.Scene;
+import com.cellwars.xml.jaxb.JaxbCreateRules;
+import com.cellwars.xml.jaxb.JaxbRulesLoader;
 import com.sun.javafx.geom.Vec2d;
 import javafx.concurrent.Task;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 import java.io.File;
 import java.io.IOException;
@@ -83,14 +84,24 @@ public class Server {
             commandLine.print("Initialize rules...");
 
             if (new File("rules.xml").isFile()) {
-                RulesLoader loadRules = new RulesLoader("rules.xml");
+                JaxbRulesLoader loadRules = new JaxbRulesLoader("rules.xml");
                 loadRules.load();
             } else {
-                CreateRules createRules = new CreateRules("rules.xml");
+                JaxbCreateRules createRules = new JaxbCreateRules("rules.xml");
                 createRules.save();
-                RulesLoader loadRules = new RulesLoader("rules.xml");
+                JaxbRulesLoader loadRules = new JaxbRulesLoader("rules.xml");
                 loadRules.load();
             }
+
+            /*if (new File("rules.xml").isFile()) {
+                DomRulesLoader loadRules = new DomRulesLoader("rules.xml");
+                loadRules.load();
+            } else {
+                DomCreateRules createRules = new DomCreateRules("rules.xml");
+                createRules.save();
+                DomRulesLoader loadRules = new DomRulesLoader("rules.xml");
+                loadRules.load();
+            }*/
         }
 
         private void createScene() {
@@ -101,7 +112,7 @@ public class Server {
 
         private void createMap() {
             commandLine.print("Creating map...");
-            Rules.MAP = new Rectangle(0, 0, 1024, 768);
+            Rules.getRules().setMap(0, 0, 1024, 768);
         }
 
         private void preparePlayers() {
@@ -159,9 +170,9 @@ public class Server {
                 //  =>
                 serverConnection.sendMessage(player,
                         "RULES",
-                        Rules.MAP.getX() + " " + Rules.MAP.getY() + " " + Rules.MAP.getWidth() + " " + Rules.MAP.getHeight(),
-                        Double.toString(Rules.CELLRADIUS),
-                        Double.toString(Rules.PACKAGERADIUS)
+                        Rules.getRules().getMap().getX() + " " + Rules.getRules().getMap().getY() + " " + Rules.getRules().getMap().getWidth() + " " + Rules.getRules().getMap().getHeight(),
+                        Double.toString(Rules.getRules().getCellRadius()),
+                        Double.toString(Rules.getRules().getPackageRadius())
                 );
 
             } catch (IOException e) {
@@ -273,7 +284,7 @@ public class Server {
                 commandLine.print(clientMessage);
 
                 return "OK";
-            } catch (Scene.InvalidLocation | Scene.InvalidPlayer e) {
+            } catch (Scene.NoPlayersInitialized | Scene.InvalidLocation | Scene.InvalidPlayer e) {
                 commandLine.print(e.getMessage());
                 return "ERROR:" + e.getMessage();
             }

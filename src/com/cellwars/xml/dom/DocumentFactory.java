@@ -1,4 +1,4 @@
-package com.cellwars.xml;
+package com.cellwars.xml.dom;
 
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Created by Tamás on 2015-05-25.
+ * Created by Tamï¿½s on 2015-05-25.
  */
 public class DocumentFactory {
     /* Singleton design pattern */
